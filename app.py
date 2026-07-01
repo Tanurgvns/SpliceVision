@@ -1,39 +1,60 @@
 import streamlit as st
 from Bio import SeqIO
+from Bio.Seq import Seq
 from io import StringIO
 import pandas as pd
 
 st.set_page_config(page_title="SpliceVision", page_icon="🧬", layout="wide")
 
 st.title("🧬 SpliceVision")
-st.subheader("Interactive Gene Splicing Analyzer")
+st.subheader("Interactive DNA Sequence Analysis Platform")
 
 st.write("""
-Welcome to **SpliceVision**!
-
-This app analyzes DNA FASTA files and detects basic splice-site signals.
+SpliceVision is an interactive bioinformatics application for exploring DNA sequences. Upload a FASTA file to analyze nucleotide composition, identify canonical splice-site motifs, detect open reading frames (ORFs), and perform DNA transcription and protein translation.
 """)
 
-uploaded_file = st.file_uploader("📂 Upload a FASTA file", type=["fasta", "fa", "txt"])
+EXAMPLE_FASTA = """>Example_DNA_Sequence
+ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAGGTAGCGTATGCGTAGCTAGCTAGCGTAGCTAGCTAGCTAA
+"""
+
+col1, col2 = st.columns(2)
+
+with col1:
+    uploaded_file = st.file_uploader(
+        "📂 Upload a FASTA file",
+        type=["fasta", "fa", "txt"]
+    )
+
+with col2:
+    use_example = st.button("🧬 Use Example FASTA")
 
 
 def clean_sequence(seq):
+    """Clean sequence text by removing spaces and converting to uppercase."""
     return str(seq).upper().replace("\n", "").replace(" ", "")
 
 
 def validate_dna(seq):
-    valid_bases = set("ATGCN")
-    return set(seq).issubset(valid_bases)
+    """Check whether the sequence contains only valid DNA bases."""
+    return set(seq).issubset(set("ATGCN"))
 
 
 def gc_content(seq):
+    """Calculate GC content percentage."""
     if len(seq) == 0:
         return 0
-    gc = seq.count("G") + seq.count("C")
-    return round((gc / len(seq)) * 100, 2)
+    return round(((seq.count("G") + seq.count("C")) / len(seq)) * 100, 2)
+
+
+def at_content(seq):
+    """Calculate AT content percentage."""
+    if len(seq) == 0:
+        return 0
+    return round(((seq.count("A") + seq.count("T")) / len(seq)) * 100, 2)
 
 
 def detect_splice_sites(seq):
+    """Detect simple canonical GT donor and AG acceptor motifs."""
     sites = []
 
     for i in range(len(seq) - 1):
@@ -53,97 +74,194 @@ def detect_splice_sites(seq):
                 "Position": i + 1
             })
 
-    return sites
+    return pd.DataFrame(sites)
 
 
-if uploaded_file is not None:
-    fasta_text = uploaded_file.read().decode("utf-8")
+def find_orfs(seq):
+    """Find open reading frames starting with ATG and ending with stop codons."""
+    stop_codons = ["TAA", "TAG", "TGA"]
+    orfs = []
+
+    for frame in range(3):
+        i = frame
+
+        while i < len(seq) - 2:
+            codon = seq[i:i + 3]
+
+            if codon == "ATG":
+                for j in range(i + 3, len(seq) - 2, 3):
+                    stop = seq[j:j + 3]
+
+                    if stop in stop_codons:
+                        orfs.append({
+                            "Frame": frame + 1,
+                            "Start": i + 1,
+                            "End": j + 3,
+                            "Length": j + 3 - i,
+                            "Stop Codon": stop
+                        })
+                        break
+
+            i += 3
+
+    return pd.DataFrame(orfs)
+
+
+if uploaded_file is not None or use_example:
+    
+    if use_example:
+        fasta_text = EXAMPLE_FASTA
+    else:
+        fasta_text = uploaded_file.read().decode("utf-8")
+
     records = list(SeqIO.parse(StringIO(fasta_text), "fasta"))
 
     if len(records) == 0:
         st.error("No FASTA sequence found.")
+
     else:
         record = records[0]
         sequence = clean_sequence(record.seq)
 
-        st.success("FASTA file uploaded successfully!")
-
-        st.header("1. Sequence Information")
-
-        st.write(f"**Sequence ID:** {record.id}")
-        st.write(f"**Sequence Length:** {len(sequence)} bases")
+        st.success("Sequence loaded successfully!")
 
         if validate_dna(sequence):
-            st.success("Valid DNA sequence")
 
-            gc = gc_content(sequence)
-            at = round(100 - gc, 2)
+            tab1, tab2, tab3, tab4, tab5 = st.tabs([
+                "📊 Overview",
+                "🧬 Composition",
+                "🔍 Splice Sites",
+                "🧪 ORF Finder",
+                "🧬 Transcription & Translation"
+            ])
 
-            base_counts = {
-                "A": sequence.count("A"),
-                "T": sequence.count("T"),
-                "G": sequence.count("G"),
-                "C": sequence.count("C"),
-                "N": sequence.count("N")
-            }
+            with tab1:
+                st.header("Sequence Information")
 
-            col1, col2, col3 = st.columns(3)
-            col1.metric("GC Content", f"{gc}%")
-            col2.metric("AT Content", f"{at}%")
-            col3.metric("Unknown Bases", base_counts["N"])
+                col1, col2, col3 = st.columns(3)
 
-            st.header("2. Nucleotide Composition")
+                col1.metric("Sequence ID", record.id)
+                col2.metric("Sequence Length", f"{len(sequence)} bases")
+                col3.metric("Unknown Bases", sequence.count("N"))
 
-            base_df = pd.DataFrame({
-                "Base": list(base_counts.keys()),
-                "Count": list(base_counts.values())
-            })
+                col4, col5 = st.columns(2)
+                col4.metric("GC Content", f"{gc_content(sequence)}%")
+                col5.metric("AT Content", f"{at_content(sequence)}%")
 
-            st.dataframe(base_df, use_container_width=True)
-            st.bar_chart(base_df.set_index("Base"))
+                st.subheader("Sequence Preview")
+                st.text_area("First 1000 bases", sequence[:1000], height=200)
 
-            st.header("3. Sequence Preview")
+                if len(sequence) > 1000:
+                    st.info("Only the first 1000 bases are shown.")
 
-            st.text_area("DNA Sequence", sequence[:1000], height=200)
+            with tab2:
+                st.header("Nucleotide Composition")
 
-            if len(sequence) > 1000:
-                st.info("Only the first 1000 bases are shown.")
+                base_counts = {
+                    "A": sequence.count("A"),
+                    "T": sequence.count("T"),
+                    "G": sequence.count("G"),
+                    "C": sequence.count("C"),
+                    "N": sequence.count("N")
+                }
 
-            st.header("4. Basic Splice-Site Detection")
+                base_df = pd.DataFrame({
+                    "Base": list(base_counts.keys()),
+                    "Count": list(base_counts.values())
+                })
 
-            splice_sites = detect_splice_sites(sequence)
+                st.dataframe(base_df, use_container_width=True)
+                st.bar_chart(base_df.set_index("Base"))
 
-            if len(splice_sites) == 0:
-                st.warning("No GT donor or AG acceptor signals found.")
-            else:
-                splice_df = pd.DataFrame(splice_sites)
+            with tab3:
+                st.header("Canonical Splice-Site Detection")
 
-                donor_count = len(splice_df[splice_df["Signal"] == "GT"])
-                acceptor_count = len(splice_df[splice_df["Signal"] == "AG"])
+                st.write("""
+                This section detects simple canonical splice-site motifs:
+                **GT** as a donor signal and **AG** as an acceptor signal.
+                """)
 
-                col1, col2 = st.columns(2)
-                col1.metric("GT Donor Sites", donor_count)
-                col2.metric("AG Acceptor Sites", acceptor_count)
+                splice_df = detect_splice_sites(sequence)
 
-                st.subheader("Detected Splice-Site Signals")
-                st.dataframe(splice_df, use_container_width=True)
+                if splice_df.empty:
+                    st.warning("No GT donor or AG acceptor signals found.")
 
-                csv = splice_df.to_csv(index=False)
+                else:
+                    donor_count = len(splice_df[splice_df["Signal"] == "GT"])
+                    acceptor_count = len(splice_df[splice_df["Signal"] == "AG"])
 
-                st.download_button(
-                    label="Download splice-site table as CSV",
-                    data=csv,
-                    file_name="splice_sites.csv",
-                    mime="text/csv"
-                )
+                    col1, col2 = st.columns(2)
+                    col1.metric("GT Donor Sites", donor_count)
+                    col2.metric("AG Acceptor Sites", acceptor_count)
 
-                st.info(
-                    "Note: This detects simple GT/AG motifs. "
-                    "Not every GT or AG is a true biological splice site."
-                )
+                    st.dataframe(splice_df, use_container_width=True)
+
+                    st.download_button(
+                        label="📥 Download splice-site table as CSV",
+                        data=splice_df.to_csv(index=False),
+                        file_name="splice_sites.csv",
+                        mime="text/csv"
+                    )
+
+                    st.info(
+                        "Note: This app detects simple GT/AG motifs only. "
+                        "Not every GT or AG motif is a true biological splice site."
+                    )
+
+            with tab4:
+                st.header("Open Reading Frame Finder")
+
+                st.write("""
+                This section detects ORFs beginning with **ATG** and ending with
+                one of the stop codons: **TAA**, **TAG**, or **TGA**.
+                """)
+
+                orf_df = find_orfs(sequence)
+
+                if orf_df.empty:
+                    st.warning("No ORFs found.")
+
+                else:
+                    st.dataframe(orf_df, use_container_width=True)
+
+                    longest_orf = orf_df.sort_values(
+                        "Length",
+                        ascending=False
+                    ).iloc[0]
+
+                    st.success(
+                        f"Longest ORF: Frame {longest_orf['Frame']} | "
+                        f"Start {longest_orf['Start']} | "
+                        f"End {longest_orf['End']} | "
+                        f"Length {longest_orf['Length']} bp"
+                    )
+
+                    st.download_button(
+                        label="📥 Download ORF table as CSV",
+                        data=orf_df.to_csv(index=False),
+                        file_name="orfs.csv",
+                        mime="text/csv"
+                    )
+
+            with tab5:
+                st.header("DNA Transcription and Protein Translation")
+
+                clean_dna = sequence.replace("N", "")
+                dna_seq = Seq(clean_dna)
+
+                rna_seq = dna_seq.transcribe()
+                protein_seq = dna_seq.translate(to_stop=False)
+
+                st.subheader("RNA Sequence Preview")
+                st.text_area("First 1000 RNA bases", str(rna_seq[:1000]), height=150)
+
+                st.subheader("Protein Sequence Preview")
+                st.text_area("First 1000 amino acids", str(protein_seq[:1000]), height=150)
+
+                st.metric("Protein Length", f"{len(protein_seq)} amino acids")
 
         else:
             st.error("Invalid DNA sequence. Use only A, T, G, C, or N.")
 
 else:
-    st.info("Please upload a FASTA file to begin.")
+    st.info("Load the demo sequence or upload a FASTA file to begin.")
