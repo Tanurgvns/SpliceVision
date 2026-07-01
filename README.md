@@ -1,33 +1,36 @@
-# 🧬 SpliceVision
+# SpliceVision
 
-## Interactive Gene Splicing Analyzer
+## Interactive DNA Sequence Analysis Platform
 
-**SpliceVision** is an interactive bioinformatics web application built with **Python**, **Streamlit**, **Biopython**, and **Pandas**. The application enables users to upload DNA sequences in FASTA format and perform basic sequence analysis and splice-site detection through an easy-to-use web interface.
+SpliceVision is a bioinformatics web application developed in Python using Streamlit, Biopython, and Pandas. The application provides an interactive interface for basic DNA sequence analysis, enabling users to upload FASTA files or use a built-in example sequence for demonstration.
+
+The project is intended as an educational and exploratory tool for sequence analysis and molecular biology workflows.
 
 ---
 
 ## Features
 
-* 📂 Upload DNA sequences in FASTA format
-* ✅ Validate DNA sequences
-* 📏 Calculate sequence length
-* 🧬 Calculate GC content
-* 📊 Calculate AT content
-* 📈 Display nucleotide composition
-* 📉 Interactive nucleotide count visualization
-* 🔍 Detect canonical splice donor (GT) sites
-* 🔍 Detect canonical splice acceptor (AG) sites
-* 📥 Download detected splice-site information as CSV
+- Upload DNA sequences in FASTA format
+- Built-in example FASTA sequence for demonstration
+- DNA sequence validation
+- Sequence length calculation
+- GC and AT content analysis
+- Nucleotide composition analysis
+- Interactive nucleotide count visualization
+- Detection of canonical splice donor (GT) and acceptor (AG) motifs
+- Open Reading Frame (ORF) identification
+- DNA transcription to RNA
+- DNA translation into protein sequence
+- Export splice-site results as CSV
 
 ---
 
-## Technologies Used
+## Technologies
 
-* Python
-* Streamlit
-* Biopython
-* Pandas
-* Git & GitHub
+- Python
+- Streamlit
+- Biopython
+- Pandas
 
 ---
 
@@ -39,13 +42,13 @@ Clone the repository:
 git clone https://github.com/Tanurgvns/SpliceVision.git
 ```
 
-Move into the project directory:
+Navigate to the project directory:
 
 ```bash
 cd SpliceVision
 ```
 
-Install dependencies:
+Install the required packages:
 
 ```bash
 pip install -r requirements.txt
@@ -57,15 +60,35 @@ Run the application:
 streamlit run app.py
 ```
 
-The application will be available at:
+---
 
-```
-http://localhost:8501
-```
+## Input
+
+The application accepts DNA sequences in FASTA format.
+
+Users may either:
+
+- Upload their own FASTA file
+- Load the built-in example FASTA sequence
 
 ---
 
-## Project Structure
+## Output
+
+The application provides:
+
+- Sequence summary statistics
+- GC and AT content
+- Nucleotide composition table and chart
+- Canonical splice-site detection
+- Open Reading Frame (ORF) predictions
+- RNA transcription
+- Protein translation
+- Downloadable CSV file containing splice-site information
+
+---
+
+## Repository Structure
 
 ```
 SpliceVision/
@@ -78,16 +101,17 @@ SpliceVision/
 
 ---
 
-## Future Improvements
+## Future Development
 
-* Exon and intron prediction
-* RNA splicing simulation
-* mRNA generation
-* Protein translation
-* Gene structure visualization
-* Mutation impact analysis
-* Interactive genome browser
-* Downloadable PDF analysis reports
+Future versions may include:
+
+- Reverse complement generation
+- Restriction enzyme site analysis
+- Sequence motif search
+- Exon and intron prediction
+- Alternative splice-site prediction
+- Interactive genome visualization
+- Downloadable PDF reports
 
 ---
 
@@ -96,3 +120,5 @@ SpliceVision/
 **Tanushka Raghuvanshi**
 
 GitHub: https://github.com/Tanurgvns
+
+LinkedIn: https://www.linkedin.com/in/tanushka30/
