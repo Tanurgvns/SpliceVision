@@ -1,6 +1,6 @@
 # 🧬 SpliceVision
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](STREAMLIT_LINK_HERE)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://splicevision-bioinfo.streamlit.app/)
 
 **Interactive DNA sequence analysis platform**
 
@@ -20,7 +20,7 @@ It is designed as an educational and exploratory tool for sequence analysis and 
 
 ## Try it
 
-Use the app online, with nothing to install: **[Open SpliceVision](STREAMLIT_LINK_HERE)**
+Use the app online, with nothing to install: **[Open SpliceVision](https://splicevision-bioinfo.streamlit.app/)**
 
 Or run it on your own computer:
 
