@@ -1,124 +1,79 @@
-# SpliceVision
+# 🧬 SpliceVision
 
-## Interactive DNA Sequence Analysis Platform
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](STREAMLIT_LINK_HERE)
 
-SpliceVision is a bioinformatics web application developed in Python using Streamlit, Biopython, and Pandas. The application provides an interactive interface for basic DNA sequence analysis, enabling users to upload FASTA files or use a built-in example sequence for demonstration.
+**Interactive DNA sequence analysis platform**
 
-The project is intended as an educational and exploratory tool for sequence analysis and molecular biology workflows.
+SpliceVision is a bioinformatics web app built in Python with Streamlit, Biopython and Pandas. Upload a FASTA file, or use the built-in example, to explore nucleotide composition, canonical splice-site motifs, open reading frames, transcription and translation.
 
----
+It is designed as an educational and exploratory tool for sequence analysis and molecular biology workflows.
 
 ## Features
 
-- Upload DNA sequences in FASTA format
-- Built-in example FASTA sequence for demonstration
-- DNA sequence validation
-- Sequence length calculation
-- GC and AT content analysis
-- Nucleotide composition analysis
-- Interactive nucleotide count visualization
-- Detection of canonical splice donor (GT) and acceptor (AG) motifs
-- Open Reading Frame (ORF) identification
-- DNA transcription to RNA
-- DNA translation into protein sequence
-- Export splice-site results as CSV
+- **Sequence input:** upload a FASTA file or load the built-in example sequence
+- **Validation:** checks that the sequence contains only A, T, G, C or N
+- **Overview:** sequence ID, length, unknown bases, GC and AT content, and a sequence preview
+- **Composition:** nucleotide count table and interactive bar chart
+- **Splice-site detection:** canonical GT donor and AG acceptor motifs, with CSV export
+- **ORF finder:** ATG-to-stop open reading frames in three forward frames, with the longest ORF highlighted and CSV export
+- **Transcription and translation:** DNA to RNA, and DNA to protein
 
----
+## Try it
 
-## Technologies
+Use the app online, with nothing to install: **[Open SpliceVision](STREAMLIT_LINK_HERE)**
 
-- Python
-- Streamlit
-- Biopython
-- Pandas
-
----
-
-## Installation
-
-Clone the repository:
+Or run it on your own computer:
 
 ```bash
 git clone https://github.com/Tanurgvns/SpliceVision.git
-```
-
-Navigate to the project directory:
-
-```bash
 cd SpliceVision
-```
-
-Install the required packages:
-
-```bash
 pip install -r requirements.txt
-```
-
-Run the application:
-
-```bash
 streamlit run app.py
 ```
 
----
+## Input and output
 
-## Input
+**Input:** a DNA sequence in FASTA format, either uploaded or the built-in example (`sample.fasta`).
 
-The application accepts DNA sequences in FASTA format.
-
-Users may either:
-
-- Upload their own FASTA file
-- Load the built-in example FASTA sequence
-
----
-
-## Output
-
-The application provides:
-
-- Sequence summary statistics
-- GC and AT content
+**Output:**
+- Sequence summary statistics, GC and AT content
 - Nucleotide composition table and chart
-- Canonical splice-site detection
-- Open Reading Frame (ORF) predictions
-- RNA transcription
-- Protein translation
-- Downloadable CSV file containing splice-site information
+- Canonical splice-site table (downloadable CSV)
+- ORF predictions (downloadable CSV)
+- RNA transcript and protein translation
 
----
+> **Note:** SpliceVision detects simple GT/AG motifs only. Not every GT or AG is a true biological splice site; real splice-site prediction also depends on the surrounding sequence context.
 
-## Repository Structure
+## Tech stack
+
+Python · Streamlit · Biopython · Pandas
+
+## Repository structure
 
 ```
 SpliceVision/
-│
-├── app.py
-├── requirements.txt
-├── README.md
-└── sample.fasta
+├── app.py            # Streamlit application
+├── requirements.txt  # Python dependencies
+├── sample.fasta      # Example DNA sequence
+└── README.md
 ```
 
----
+## Future development
 
-## Future Development
-
-Future versions may include:
-
-- Reverse complement generation
+- Reverse complement and six-frame ORF search
 - Restriction enzyme site analysis
 - Sequence motif search
 - Exon and intron prediction
 - Alternative splice-site prediction
-- Interactive genome visualization
 - Downloadable PDF reports
 
----
+## Related project
+
+**[DNA Viewer](https://github.com/Tanurgvns/dna-viewer)**: an interactive double-helix visualizer for FASTA files, with GC content plots, six-frame translation and motif search. [Try it live](https://dna-viewer-tanurgvns.streamlit.app/).
 
 ## Author
 
 **Tanushka Raghuvanshi**
 
-GitHub: https://github.com/Tanurgvns
-
-LinkedIn: https://www.linkedin.com/in/tanushka30/
+- GitHub: [Tanurgvns](https://github.com/Tanurgvns)
+- LinkedIn: [tanushka30](https://www.linkedin.com/in/tanushka30/)
