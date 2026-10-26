@@ -26,7 +26,14 @@ with col1:
     )
 
 with col2:
-    use_example = st.button("🧬 Use Example FASTA")
+    if st.button("🧬 Use Example FASTA"):
+        st.session_state["use_example"] = True
+
+# A new upload replaces the example
+if uploaded_file is not None:
+    st.session_state["use_example"] = False
+
+use_example = st.session_state.get("use_example", False)
 
 
 def clean_sequence(seq):
@@ -170,7 +177,7 @@ if uploaded_file is not None or use_example:
                     "Count": list(base_counts.values())
                 })
 
-                st.dataframe(base_df, use_container_width=True)
+                st.dataframe(base_df, width="stretch")
                 st.bar_chart(base_df.set_index("Base"))
 
             with tab3:
@@ -194,7 +201,7 @@ if uploaded_file is not None or use_example:
                     col1.metric("GT Donor Sites", donor_count)
                     col2.metric("AG Acceptor Sites", acceptor_count)
 
-                    st.dataframe(splice_df, use_container_width=True)
+                    st.dataframe(splice_df, width="stretch")
 
                     st.download_button(
                         label="📥 Download splice-site table as CSV",
@@ -222,7 +229,7 @@ if uploaded_file is not None or use_example:
                     st.warning("No ORFs found.")
 
                 else:
-                    st.dataframe(orf_df, use_container_width=True)
+                    st.dataframe(orf_df, width="stretch")
 
                     longest_orf = orf_df.sort_values(
                         "Length",
@@ -247,6 +254,7 @@ if uploaded_file is not None or use_example:
                 st.header("DNA Transcription and Protein Translation")
 
                 clean_dna = sequence.replace("N", "")
+                clean_dna = clean_dna[: len(clean_dna) - len(clean_dna) % 3]  # whole codons only
                 dna_seq = Seq(clean_dna)
 
                 rna_seq = dna_seq.transcribe()
